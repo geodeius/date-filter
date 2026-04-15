@@ -66,10 +66,21 @@ export default function CustomRangeView({ onBack, onApply, initialDate = new Dat
     from.setHours(0, 0, 0, 0);
     const to = new Date(draft.to || draft.from);
     to.setHours(23, 59, 59, 999);
+    const fmt = { month: 'short', day: 'numeric' };
+    const fmtYear = { month: 'short', day: 'numeric', year: 'numeric' };
+    const sameYear = from.getFullYear() === to.getFullYear();
+    const label =
+      from.toDateString() === to.toDateString()
+        ? from.toLocaleDateString(undefined, fmtYear)
+        : `${from.toLocaleDateString(undefined, fmt)} – ${to.toLocaleDateString(
+            undefined,
+            sameYear ? fmtYear : fmtYear
+          )}`;
     onApply({
       from: from.toISOString(),
       to: to.toISOString(),
       preset: 'custom',
+      label,
     });
   }
 

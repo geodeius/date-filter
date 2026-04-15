@@ -19,11 +19,12 @@ function useDelayedUnmount(open, exitMs = 200) {
   return { mounted, visible };
 }
 
-function labelFor(selectedPresetId, currentRange) {
+function labelFor(selectedPresetId, customLabel, currentRange) {
   if (selectedPresetId) {
     const p = PRESETS.find((x) => x.id === selectedPresetId);
     if (p) return p.label;
   }
+  if (customLabel) return customLabel;
   if (currentRange?.from && currentRange?.to) return 'Custom range';
   return 'Date/time';
 }
@@ -37,6 +38,7 @@ export default function DateFilter({ value, defaultValue = null, onChange, timez
   const [view, setView] = useState('presets');
   const [viewDirection, setViewDirection] = useState('forward');
   const [selectedPresetId, setSelectedPresetId] = useState(null);
+  const [customLabel, setCustomLabel] = useState(null);
   const rootRef = useRef(null);
 
   const { mounted, visible } = useDelayedUnmount(open, 200);
@@ -66,18 +68,21 @@ export default function DateFilter({ value, defaultValue = null, onChange, timez
     const r = resolvePreset(id);
     if (!r) return;
     setSelectedPresetId(id);
+    setCustomLabel(null);
     emit({ ...r, preset: id });
     setOpen(false);
   }
 
   function handleShorthand(r) {
     setSelectedPresetId(null);
-    emit({ ...r, preset: 'custom' });
+    setCustomLabel(r.label || null);
+    emit({ from: r.from, to: r.to, preset: 'custom', label: r.label });
     setOpen(false);
   }
 
   function handleApplyCustom(r) {
     setSelectedPresetId(null);
+    setCustomLabel(r.label || null);
     emit(r);
     setOpen(false);
     setTimeout(() => {
@@ -96,7 +101,7 @@ export default function DateFilter({ value, defaultValue = null, onChange, timez
     setView('presets');
   }
 
-  const label = labelFor(selectedPresetId, current);
+  const label = labelFor(selectedPresetId, customLabel, current);
 
   return (
     <div ref={rootRef} className="relative inline-block font-sans">
