@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import Calendar from './Calendar.jsx';
+import Option from './Option.jsx';
 import { MONTH_NAMES } from './calendar.js';
 
 function VerticalPicker({ items, selectedIndex, onPick, onClose }) {
   const ref = useRef(null);
 
   useEffect(() => {
-    const el = ref.current?.querySelector('[data-selected="true"]');
+    const el = ref.current?.querySelector('[data-active="true"]');
     if (el) el.scrollIntoView({ block: 'center' });
   }, []);
 
@@ -24,41 +25,14 @@ function VerticalPicker({ items, selectedIndex, onPick, onClose }) {
       className="df-picker max-h-[248px] overflow-y-auto flex flex-col gap-0.5 px-1 py-1"
       role="listbox"
     >
-      {items.map((item, i) => {
-        const active = i === selectedIndex;
-        return (
-          <button
-            key={item.key}
-            type="button"
-            role="option"
-            aria-selected={active}
-            data-selected={active}
-            onClick={() => onPick(i)}
-            className="df-option"
-            data-active={active}
-          >
-            <span>{item.label}</span>
-            {active && (
-              <svg
-                className="df-option-check"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                aria-hidden
-              >
-                <path
-                  d="M3 8.5L6.5 12L13 5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            )}
-          </button>
-        );
-      })}
+      {items.map((item, i) => (
+        <Option
+          key={item.key}
+          label={item.label}
+          active={i === selectedIndex}
+          onClick={() => onPick(i)}
+        />
+      ))}
     </div>
   );
 }
